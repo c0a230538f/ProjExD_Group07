@@ -113,6 +113,7 @@ def main():
         energy = cal[0]#車の持つエネルギーを更新
         sokudo = cal[1] #車の速度を更新
 
+
         #背景画像を描画
         idoukyori += sokudo/20 # 背景画像の移動量を計算
         idoukyori %= sizey
