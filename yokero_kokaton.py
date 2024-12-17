@@ -8,7 +8,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))  # スクリプトのディ
 
 # スピードメーターを描画するクラス
 class Speedometer:
-    def __init__(self, screen, sizex, sizey):
+    def __init__(self, screen:pg.display, sizex:int, sizey:int):
         self.screen = screen # スクリーンサーフェースを設定
         self.sizex = sizex # ウィンドウの幅を設定
         self.sizey = sizey # ウィンドウの高さを設定
@@ -16,7 +16,7 @@ class Speedometer:
         self.meter_y = sizey - sizey / 11 # メーターのy座標を設定
         self.meter_radius = sizey / 12 # メーターの半径を設定
 
-    def draw(self, sokudo):
+    def draw(self, sokudo:float):
         meter_angle = -45 + (sokudo / 150) * 180  # 速度に応じた角度（0-150km/hを180-45度の位置に変換）
         # メーターの背景円を描画
         pg.draw.circle(self.screen, (50, 50, 50), (self.meter_x, self.meter_y), self.meter_radius, 4) # メーターの背景円を描画
@@ -58,7 +58,7 @@ class Speedometer:
         self.screen.blit(text, text_rect)  # 速度計の文字列をスクリーンに描画
 
 
-def cal_power(sokudo, power):
+def cal_power(sokudo:float, power:int):
     """
     車のパワーを計算する関数
     速度に応じて車のパワーを変化させる
@@ -71,10 +71,10 @@ def cal_power(sokudo, power):
         power2 = power*a
     else: #速度が80を超えたら、パワーを一定にする
         power2 = power
-        
+
     return power2
 
-def cal_speed(sokudo, energy):
+def cal_speed(sokudo:float, energy:float):
     """
     車の速度を計算する関数
     速度に応じて車の持つエネルギーを空気抵抗として減少させ、エネルギーを速度に変換する。
