@@ -59,16 +59,28 @@ class Speedometer:
 
 
 def cal_power(sokudo, power):
+    """
+    車のパワーを計算する関数
+    速度に応じて車のパワーを変化させる
+    sokudo: 車の速度
+    power: 車のパワー
+    """
     #速度が一定になるまでは緩やかに加速
     if sokudo < (80*math.log(power, 280)):
-        a = 0.00000001+(sokudo)/(80*math.log(power, 280))
+        a = 0.00000001+(sokudo)/(80*math.log(power, 280)) #速度が80になるまでは、0.???倍のパワーになる
         power2 = power*a
-    else:
+    else: #速度が80を超えたら、パワーを一定にする
         power2 = power
-    
+        
     return power2
 
 def cal_speed(sokudo, energy):
+    """
+    車の速度を計算する関数
+    速度に応じて車の持つエネルギーを空気抵抗として減少させ、エネルギーを速度に変換する。
+    sokudo: 車の速度
+    energy: 車の持つエネルギー
+    """
     #車への空気抵抗、最大速度が決まる
     if sokudo > 0:
         energy -= (10*((1.014)**sokudo))-10
@@ -124,10 +136,9 @@ def main():
         screen.blit(bg_img, [0, idoukyori - sizey * 4])  # 背景画像をスクリーンに描画
         screen.blit(bg_img, [0, idoukyori - sizey * 5])  # 背景画像をスクリーンに描画
 
-        # Speedometerクラスを使用
-        speedometer = Speedometer(screen, sizex, sizey)
-        # スピードメーターを描画
-        speedometer.draw(sokudo)
+        
+        speedometer = Speedometer(screen, sizex, sizey) # Speedometerクラスを使用
+        speedometer.draw(sokudo) # スピードメーターを描画
 
         pg.display.update() # 画面を更新
         clock.tick(framerate)  # フレームレートを設定
