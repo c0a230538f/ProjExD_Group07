@@ -393,13 +393,9 @@ def main():
         screen.blit(bg_img, [0, idoukyori - sizey * 4])  # 背景画像をスクリーンに描画
         screen.blit(bg_img, [0, idoukyori - sizey * 5])  # 背景画像をスクリーンに描画
         screen.blit(kt_img, kt_rct)  # 車の画像をスクリーンに描画
-        speedometer = Speedometer(screen, sizex, sizey) # Speedometerクラスを使用
-        speedometer.draw(sokudo) # スピードメーターを描画
         
         for obj in kks:
             obj.draw(screen)
-
-        
 
         if car_lights.blinker_timer > 0:  # ウインカーのタイマーが0より大きい場合
             if car_lights.blinker_timer % 80 < 40:  # 0.4秒間隔でウインカーを点滅させる
@@ -408,6 +404,9 @@ def main():
         if car_lights.brake_timer > 0:
             car_lights.draw_brake_lamp(screen, kt_rct)
             car_lights.brake_timer -= 1
+            
+        speedometer = Speedometer(screen, sizex, sizey) # Speedometerクラスを使用
+        speedometer.draw(sokudo) # スピードメーターを描画
 
         clock.tick(framerate)  # フレームレートを設定
         pg.display.update()  # 画面を更新
