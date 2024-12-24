@@ -366,16 +366,19 @@ def main():
         
         distance += sokudo/3600/(clock.get_fps()+1)# 移動距離を計算
 
-        if spawn_timer < 0:  # 120フレームごとにこうかとんを生成
+        if spawn_timer < 0:  # 車の速度によってこうかとんを生成
             kks.append(Bird(sizex))
             spawn_timer = 600
-        spawn_timer -= 5
+        spawn_timer -= sokudo/30
         
 
         for obj in kks[:]:
             obj.update(sokudo/20)
-           # if obj.rect.colliderect( ): #車の変数を入れる
-                 # 衝突したらゲームオーバー
+            if obj.rect.colliderect(kt_rct): #車の変数を入れる
+                GameOver = GameOverScreen(screen, sizex, sizey)
+                GameOver.display(int(maxspeed), tmr// framerate, ("%.3f"%(distance)))
+                time.sleep(3)
+                return  # 衝突したらゲームオーバー
             if obj.off_screen(sizey):
                 kks.remove(obj)
 
