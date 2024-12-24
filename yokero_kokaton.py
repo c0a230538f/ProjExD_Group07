@@ -119,7 +119,6 @@ def main():
         screen.blit(bg_img, [0, idoukyori - sizey * 5])  # 背景画像をスクリーンに描画
         screen.blit(kt_img, kt_rct)  # 車の画像をスクリーンに描画
 
-        pg.display.update() # 画面を更新
         clock.tick(framerate)  # フレームレートを設定
 
         if blinker_timer > 0:  # ウインカーのタイマーが0より大きい場合
