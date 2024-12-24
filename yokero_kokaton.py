@@ -182,7 +182,7 @@ def main():
         
 
         for obj in kks[:]:
-            obj.update(sokudo/20)
+            obj.update(5)
            # if obj.rect.colliderect( ): #車の変数を入れる
                  # 衝突したらゲームオーバー
             if obj.off_screen(sizey):
