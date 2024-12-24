@@ -14,7 +14,7 @@ class Speedometer:
         self.sizey = sizey # ウィンドウの高さを設定
         self.meter_x = sizex - sizex / 7 # メーターのx座標を設定
         self.meter_y = sizey - sizey / 11 # メーターのy座標を設定
-        self.meter_radius = 100 # メーターの半径を設定
+        self.meter_radius = 80 # メーターの半径を設定
 
     def draw(self, sokudo:float):
         meter_huti = self.meter_radius//10 # メーターの縁の太さ
@@ -182,7 +182,7 @@ def main():
         
 
         for obj in kks[:]:
-            obj.update(5)
+            obj.update(sokudo/20)
            # if obj.rect.colliderect( ): #車の変数を入れる
                  # 衝突したらゲームオーバー
             if obj.off_screen(sizey):
