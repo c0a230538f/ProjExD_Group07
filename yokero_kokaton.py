@@ -150,13 +150,13 @@ class CarLights:
         blinker_size = (10, 20)  # ウインカーのサイズを設定
         if direction == "left":  # 左に動く場合
             blinker_positions = [  # 左ウインカーの位置を設定
-                (kt_rct.left - blinker_size[0], kt_rct.top),
-                (kt_rct.left - blinker_size[0], kt_rct.bottom - blinker_size[1])
+                (kt_rct.left - blinker_size[0] + 5, kt_rct.top),
+                (kt_rct.left - blinker_size[0] + 5, kt_rct.bottom - blinker_size[1])
             ]
         elif direction == "right":  # 右に動く場合
             blinker_positions = [  # 右ウインカーの位置を設定
-                (kt_rct.right, kt_rct.top),
-                (kt_rct.right, kt_rct.bottom - blinker_size[1])
+                (kt_rct.right - 5, kt_rct.top),
+                (kt_rct.right - 5, kt_rct.bottom - blinker_size[1])
             ]
         for pos in blinker_positions:
             pg.draw.rect(screen, blinker_color, (*pos, *blinker_size))  # ウインカーを描画
@@ -281,7 +281,7 @@ def main():
     tmr = 0  # タイマーを初期化
     bg_img = pg.image.load("fig/tuujyou_miti3.jpg")  # 背景画像をロード
     bg_img = pg.transform.scale(bg_img, (sizex, sizey))  # 背景画像のサイズを変更
-    kt_img = pg.image.load("fig/car1.png")  # 車の画像をロード
+    kt_img = pg.image.load("fig/car2.png")  # 車の画像をロード
     kt_img = pg.transform.scale(kt_img, (100, 200))  # 車の画像のサイズを変更
     kt_img = pg.transform.flip(kt_img, True, False)  # 車の画像を左右反転
     kt_rct = kt_img.get_rect()  # 車の画像の矩形（Rect）オブジェクトを取得
@@ -404,7 +404,7 @@ def main():
         if car_lights.brake_timer > 0:
             car_lights.draw_brake_lamp(screen, kt_rct)
             car_lights.brake_timer -= 1
-            
+
         speedometer = Speedometer(screen, sizex, sizey) # Speedometerクラスを使用
         speedometer.draw(sokudo) # スピードメーターを描画
 
