@@ -99,20 +99,14 @@ def cal_speed(sokudo:float, energy:float, clp:bool):
 
 
 class Bird():
-    def __init__(self):
+    def __init__(self, sizex:int):
         """
         こうかとんの初期化
         """
         self.img = pg.image.load("fig/5.png") #こうかとん画像をロード
         self.rect = self.img.get_rect() #こうかとんの画像のオブジェクトを取得
          
-        bird_x = random.randint(0,2)  # #こうかとんのオブジェクトのx座標の種類を設定
-        if bird_x == 0:
-            self.rect.x = 100 #左車線に生成
-        elif bird_x == 1:
-            self.rect.x = 300 #真ん中車線に生成
-        elif bird_x == 2:
-            self.rect.x = 500 #右車線に生成
+        self.rect.x = random.randint(50, sizex - 50)  # #こうかとんのオブジェクトのx座標の種類を設定
         self.rect.y = -100  # 初期位置は画面の上
         
     
@@ -237,10 +231,12 @@ class GameOverScreen:
         max_speed_text = font_small.render(f"Max Speed: {max_speed} km/h", True, (255, 255, 255))
         elapsed_time_text = font_small.render(f"Time: {elapsed_time} s", True, (255, 255, 255))
         distance_text = font_small.render(f"Distance: {distance} km", True, (255, 255, 255))
+        score_text = font_small.render(f"score: {str(int((float(max_speed) * 100 / 30 - float(elapsed_time)) + ((float(distance)*100000) / (float(elapsed_time)+1))))}", True, (255, 255, 255))
 
         self.screen.blit(max_speed_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 50))
         self.screen.blit(elapsed_time_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 100))
         self.screen.blit(distance_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 150))
+        self.screen.blit(score_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 200))
         pg.display.update()
         time.sleep(10)  # 10秒間待つ
         pg.quit()  # Pygameを終了
@@ -371,13 +367,13 @@ def main():
         distance += sokudo/3600/(clock.get_fps()+1)# 移動距離を計算
 
         if spawn_timer < 0:  # 120フレームごとにこうかとんを生成
-            kks.append(Bird())
+            kks.append(Bird(sizex))
             spawn_timer = 600
         spawn_timer -= 5
         
 
         for obj in kks[:]:
-            obj.update(5)
+            obj.update(sokudo/20)
            # if obj.rect.colliderect( ): #車の変数を入れる
                  # 衝突したらゲームオーバー
             if obj.off_screen(sizey):
