@@ -75,7 +75,7 @@ def cal_power(sokudo:float, power:int):
 
     return power2
 
-def cal_speed(sokudo:float, energy:float):
+def cal_speed(sokudo:float, energy:float, clp:bool):
     """
     車の速度を計算する関数
     速度に応じて車の持つエネルギーを空気抵抗として減少させ、エネルギーを速度に変換する。
@@ -88,7 +88,7 @@ def cal_speed(sokudo:float, energy:float):
         if energy < 0:
             energy = 0
     #車の速度が12km/h以下の場合は、クリープ現象を再現する
-    if sokudo < 12.3:
+    if sokudo < 12.3 and clp:
         energy += random.randint(0, 4)
     #車の持つエネルギーを速度に変換する
     sokudo = math.sqrt(energy)/4
@@ -186,6 +186,65 @@ class CarLights:
             pg.draw.rect(screen, brake_lamp_color, (*pos, *brake_lamp_size))  # ブレーキランプを描画
 
 
+def coment1(screen: pg.surface,yoko,tate, start_time):
+    """
+    画面に「急ブレーキ」という文字を表示する
+    引数: screen, yoko, tate, start_time
+    戻り値: start_time + 3
+    """
+    # 日本語を描画するために、フォントファイルを指定
+    font_path = pg.font.match_font('msgothic')  # MS ゴシックフォントを使用
+    font = pg.font.Font(font_path, 120)  # フォントを作成
+    moji = font.render("急ブレーキ", True, (255, 0, 0))  # 文字の内容と色を指定
+    screen.blit(moji, [yoko-100, tate])  # 文字を画面に描画
+    pg.display.update()
+    return start_time + 3
+
+class GameOverScreen:
+    """
+    ゲームオーバー画面を表示するクラス
+    """
+    def __init__(self, screen: pg.Surface, WIDTH: int, HEIGHT: int):
+        """
+        ゲームオーバー画面を表示するクラスのコンストラクタ
+        引数: screen, WIDTH, HEIGHT
+        戻り値: なし
+        """
+        self.screen = screen
+        self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
+
+    def display(self, max_speed: int, elapsed_time: int, distance: int):
+        """
+        ゲームオーバー画面を表示する
+        引数: max_speed, elapsed_time, distance
+        戻り値: なし
+        """
+        background = pg.Surface(self.screen.get_size())  # 画面と同じサイズのSurfaceを作成
+        pg.draw.rect(background, (0, 0, 0), (0, 0, self.WIDTH, self.HEIGHT))  # 黒色の背景を描画
+        pg.Surface.set_alpha(background, 130)  # 透明度を130に設定
+        self.screen.blit(background, (0, 0))  # 背景を画面に描画
+
+        # ハイライトのための背景矩形を描画
+        highlight_rect = pg.Rect(self.WIDTH / 2 - 175, self.HEIGHT / 2 - 10, 365, 70)
+        pg.draw.rect(self.screen, (255,255,153), highlight_rect)
+
+        font = pg.font.Font(None, 80)  # フォントを作成
+        moji = font.render("GAME OVER", True, (255, 0, 0))  # 文字の内容と色を指定
+        self.screen.blit(moji, [self.WIDTH / 2 - 165, self.HEIGHT / 2])  # 文字を画面に描画
+
+        font_small = pg.font.Font(None, 36)
+        max_speed_text = font_small.render(f"Max Speed: {max_speed} km/h", True, (255, 255, 255))
+        elapsed_time_text = font_small.render(f"Time: {elapsed_time} s", True, (255, 255, 255))
+        distance_text = font_small.render(f"Distance: {distance} km", True, (255, 255, 255))
+
+        self.screen.blit(max_speed_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 50))
+        self.screen.blit(elapsed_time_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 100))
+        self.screen.blit(distance_text, (self.WIDTH // 2 - 100, self.HEIGHT // 2 - 150))
+        pg.display.update()
+        time.sleep(10)  # 10秒間待つ
+        pg.quit()  # Pygameを終了
+
 
 def main():
     """
@@ -200,6 +259,7 @@ def main():
     energy = 0 # 車のエネルギー(速度の算出に使用)
     sokudo = 0 # 速度の初期値
     power = 300 # 車のパワー
+    clp = False # クリープ現象の有無
 
     pg.display.set_caption("こうかとんをよけろ！")  # ウィンドウのキャプションを設定
     screen = pg.display.set_mode((sizex, sizey))  # ウィンドウのサイズを設定し、スクリーンサーフェースを作成
@@ -219,8 +279,8 @@ def main():
     
     while True:
         for event in pg.event.get():  # イベントキューからイベントを取得
-            if event.type == pg.QUIT: return  # ウィンドウの閉じるボタンが押されたら終了
-
+            if event.type == pg.QUIT: return  # ウィンドウの閉じるボタンが押されたら終了              
+        
         key_lst = pg.key.get_pressed()  # 押されているキーのリストを取得
         if key_lst[pg.K_UP]:  # 上矢印キーが押されたら    
             energy += cal_power(sokudo, power) #車の持つエネルギーを加算し続ける
@@ -232,8 +292,13 @@ def main():
             # 下キーが押され始めた時間を記録
             if down_key_start_time is None:
                 down_key_start_time = time.time()
+            elif time.time() - down_key_start_time >= 1: # 下キーが1秒以上押され続けている場合
+                if sokudo > 0:
+                    coment1(screen, 100, 100, time.time())
+            clp = False  
         else:
             down_key_start_time = None
+            clp = True
         
         if key_lst[pg.K_LEFT]:  # 左矢印キーが押されたら
             car_lights.blinker_direction = "left"  # ウインカーの方向を設定
@@ -246,7 +311,7 @@ def main():
 
 
         #車速度を計算
-        cal = cal_speed(sokudo, energy) #空気抵抗を計算し、車の持つエネルギーを速度に変換する
+        cal = cal_speed(sokudo, energy, clp) #空気抵抗を計算し、車の持つエネルギーを速度に変換する
         energy = cal[0]#車の持つエネルギーを更新
         sokudo = cal[1] #車の速度を更新
 
@@ -290,9 +355,8 @@ def main():
             car_lights.draw_brake_lamp(screen, kt_rct)
             car_lights.brake_timer -= 1
 
-        pg.display.update() # 画面を更新
         clock.tick(framerate)  # フレームレートを設定
-        pg.display.update()
+        pg.display.update()  # 画面を更新
         tmr += 1
 
 
