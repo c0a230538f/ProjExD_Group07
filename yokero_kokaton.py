@@ -97,11 +97,50 @@ def cal_speed(sokudo:float, energy:float):
     return energy, sokudo
 
 
+
+class Bird():
+    def __init__(self):
+        """
+        こうかとんの初期化
+        """
+        self.img = pg.image.load("fig/5.png") #こうかとん画像をロード
+        self.rect = self.img.get_rect() #こうかとんの画像のオブジェクトを取得
+         
+        bird_x = random.randint(0,2)  # #こうかとんのオブジェクトのx座標の種類を設定
+        if bird_x == 0:
+            self.rect.x = 100 #左車線に生成
+        elif bird_x == 1:
+            self.rect.x = 300 #真ん中車線に生成
+        elif bird_x == 2:
+            self.rect.x = 500 #右車線に生成
+        self.rect.y = -100  # 初期位置は画面の上
+        
+    
+    def update(self, speed):
+        """
+        こうかとんを下に移動する
+        """
+        self.speed = speed  # こうかとんが動く速度
+        self.rect.y += self.speed
+
+    def draw(self, screen):
+        """
+        こうかとんを描画する
+        """
+        screen.blit(self.img, self.rect)
+
+    
+    def off_screen(self, screen_height):
+        """
+        画面外に出たか判定
+        """
+        return self.rect.y > screen_height
+
 def main():
     sizex = 600 # ウィンドウの幅を設定
     sizey = 800 # ウィンドウの高さを設定
     framerate = 200 # フレームレートを設定
-    idoukyori = 0 # 移動距離の初期値
+    idoukyori = 0  # 移動距離の初期値
     energy = 0 # 車のエネルギー(速度の算出に使用)
     sokudo = 0 # 速度の初期値
     power = 300 # 車のパワー
@@ -112,12 +151,19 @@ def main():
     bg_img = pg.image.load("fig/tuujyou_miti3.jpg")  # 背景画像をロード
     bg_img = pg.transform.scale(bg_img, (sizex, sizey))  # 背景画像のサイズを変更
 
+    kks = [] #こうかとんのリスト
+    spawn_timer = 600 #こうかとんが出現する頻度
+    
     while True:
         for event in pg.event.get():  # イベントキューからイベントを取得
             if event.type == pg.QUIT: return  # ウィンドウの閉じるボタンが押されたら終了
 
+        
+        
         key_lst = pg.key.get_pressed()  # 押されているキーのリストを取得
         if key_lst[pg.K_UP]:  # 上矢印キーが押されたら
+            
+
             energy += cal_power(sokudo, power) #車の持つエネルギーを加算し続ける
         elif key_lst[pg.K_DOWN]:  # 下矢印キーが押されたら
             energy -= cal_power(sokudo, power)*2 #車の持つエネルギーを減らす
@@ -129,6 +175,19 @@ def main():
         energy = cal[0]#車の持つエネルギーを更新
         sokudo = cal[1] #車の速度を更新
 
+        if spawn_timer < 0:  # 120フレームごとにこうかとんを生成
+            kks.append(Bird())
+            spawn_timer = 600
+        spawn_timer -= 5
+        
+
+        for obj in kks[:]:
+            obj.update(5)
+           # if obj.rect.colliderect( ): #車の変数を入れる
+                 # 衝突したらゲームオーバー
+            if obj.off_screen(sizey):
+                kks.remove(obj)
+
 
         #背景画像を描画
         idoukyori += sokudo/20 # 背景画像の移動量を計算
@@ -139,10 +198,11 @@ def main():
         screen.blit(bg_img, [0, idoukyori - sizey * 3])  # 背景画像をスクリーンに描画
         screen.blit(bg_img, [0, idoukyori - sizey * 4])  # 背景画像をスクリーンに描画
         screen.blit(bg_img, [0, idoukyori - sizey * 5])  # 背景画像をスクリーンに描画
-
-        
         speedometer = Speedometer(screen, sizex, sizey) # Speedometerクラスを使用
         speedometer.draw(sokudo) # スピードメーターを描画
+        
+        for obj in kks:
+            obj.draw(screen)
 
         pg.display.update() # 画面を更新
         clock.tick(framerate)  # フレームレートを設定
