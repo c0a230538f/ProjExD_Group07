@@ -246,6 +246,18 @@ class GameOverScreen:
         pg.quit()  # Pygameを終了
 
 
+def bakuhatu(screen:pg.surface, kt_rct, fire_img, left, right):
+    # 爆発画像を描画
+    if left:
+        fire_rct = fire_img.get_rect(midleft=(kt_rct.right - 250, kt_rct.centery))  # 爆発画像の矩形を車の右側に設定
+        screen.blit(fire_img, fire_rct)  # 爆発画像を描画 
+        return "end"
+    if right:
+        fire_rct = fire_img.get_rect(midright=(kt_rct.left + 250, kt_rct.centery))  # 爆発画像の矩形を車の左側に設定
+        screen.blit(fire_img, fire_rct)  # 爆発画像を描画
+        return "end"
+    
+
 def main():
     """
     メイン関数
@@ -260,6 +272,12 @@ def main():
     sokudo = 0 # 速度の初期値
     power = 300 # 車のパワー
     clp = False # クリープ現象の有無
+    idoukyori = 0
+    explosion_migi = False  # 右の爆発の状態を初期化
+    explosion_hidari = False  # 左の爆発の状態を初期化
+    kx = 0
+    maxspeed = 0
+    distance = 0
 
     pg.display.set_caption("こうかとんをよけろ！")  # ウィンドウのキャプションを設定
     screen = pg.display.set_mode((sizex, sizey))  # ウィンドウのサイズを設定し、スクリーンサーフェースを作成
@@ -272,6 +290,8 @@ def main():
     kt_img = pg.transform.flip(kt_img, True, False)  # 車の画像を左右反転
     kt_rct = kt_img.get_rect()  # 車の画像の矩形（Rect）オブジェクトを取得
     kt_rct.center = 300, 530  # 車の矩形オブジェクトの中心を設定
+    fire_img = pg.image.load("fig/fire.png")  # 爆発画像をロード
+    fire_img = pg.transform.scale(fire_img, (500, 500))  # 爆発画像のサイズを変更
     car_lights = CarLights()  # CarLightsクラスのインスタンスを作成
     down_key_start_time = None  # 下キーが押され始めた時間を初期化
     kks = [] #こうかとんのリスト
@@ -280,8 +300,28 @@ def main():
     while True:
         for event in pg.event.get():  # イベントキューからイベントを取得
             if event.type == pg.QUIT: return  # ウィンドウの閉じるボタンが押されたら終了              
-        
+        kx = 0
+
         key_lst = pg.key.get_pressed()  # 押されているキーのリストを取得
+        if key_lst[pg.K_LEFT]:  # 左矢印キーが押されたら
+            car_lights.blinker_direction = "left"  # ウインカーの方向を設定
+            car_lights.blinker_timer += 1  # ウインカーのタイマーを増加
+            if sokudo > 0.5:
+                if sokudo < 25:
+                    kx -= 1 + (sokudo/25)*2
+                else:
+                    kx -= 3
+        elif key_lst[pg.K_RIGHT]:  # 右矢印キーが押されたら
+            car_lights.blinker_direction = "right"  # ウインカーの方向を設定
+            car_lights.blinker_timer += 1  # ウインカーのタイマーを増加
+            if sokudo > 0.5:
+                if sokudo < 25:
+                    kx = 1 + (sokudo/25)*2
+                else:
+                    kx = 3
+        else:
+            car_lights.blinker_timer = 0
+
         if key_lst[pg.K_UP]:  # 上矢印キーが押されたら    
             energy += cal_power(sokudo, power) #車の持つエネルギーを加算し続ける
         elif key_lst[pg.K_DOWN]:  # 下矢印キーが押されたら
@@ -296,24 +336,39 @@ def main():
                 if sokudo > 0:
                     coment1(screen, 100, 100, time.time())
             clp = False  
+            kx *= 0.7
         else:
             down_key_start_time = None
             clp = True
         
-        if key_lst[pg.K_LEFT]:  # 左矢印キーが押されたら
-            car_lights.blinker_direction = "left"  # ウインカーの方向を設定
-            car_lights.blinker_timer += 1  # ウインカーのタイマーを増加
-        elif key_lst[pg.K_RIGHT]:  # 右矢印キーが押されたら
-            car_lights.blinker_direction = "right"  # ウインカーの方向を設定
-            car_lights.blinker_timer += 1  # ウインカーのタイマーを増加
-        else:
-            car_lights.blinker_timer = 0
+        
+            
+        kt_rct.move_ip(kx, 0)  # 車の矩形オブジェクトを移動
+
+        # 壁に衝突したかどうかを判定
+        if kt_rct.right >= screen.get_width():
+            explosion_migi = True  # 爆発の状態を設定
+
+        elif kt_rct.left <= 0:
+            explosion_hidari = True
+
+        a = bakuhatu(screen, kt_rct, fire_img, explosion_hidari, explosion_migi)
+        if a == "end":
+            GameOver = GameOverScreen(screen, sizex, sizey)
+            GameOver.display(int(maxspeed), tmr// framerate, ("%.3f"%(distance)))
+            time.sleep(3)
+            return
 
 
         #車速度を計算
         cal = cal_speed(sokudo, energy, clp) #空気抵抗を計算し、車の持つエネルギーを速度に変換する
         energy = cal[0]#車の持つエネルギーを更新
         sokudo = cal[1] #車の速度を更新
+        
+        if maxspeed < sokudo:# 最高速度を記録
+            maxspeed = sokudo
+        
+        distance += sokudo/3600/(clock.get_fps()+1)# 移動距離を計算
 
         if spawn_timer < 0:  # 120フレームごとにこうかとんを生成
             kks.append(Bird())
