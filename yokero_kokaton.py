@@ -17,6 +17,7 @@ class Speedometer:
         screen: スクリーンサーフェース
         sizex: ウィンドウの幅
         sizey: ウィンドウの高さ
+        meter_radius変数: メーターの半径
         """
         self.screen = screen # スクリーンサーフェースを設定
         self.sizex = sizex # ウィンドウの幅を設定
@@ -29,7 +30,6 @@ class Speedometer:
         """
         スピードメーターを描画する関数
         sokudo: 車の速度
-        meter_huti変数: メーターの大きさを決める
         """
         meter_huti = self.meter_radius//10 # メーターの縁の太さ
         meter_angle = -45 + (sokudo / 150) * 180  # 速度に応じた角度（0-150km/hを180-45度の位置に変換）
