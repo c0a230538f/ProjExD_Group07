@@ -8,7 +8,16 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))  # スクリプトのディ
 
 # スピードメーターを描画するクラス
 class Speedometer:
+    """
+    スピードメーターを描画するクラス 
+    """
     def __init__(self, screen:pg.display, sizex:int, sizey:int):
+        """
+        スピードメーターの初期化
+        screen: スクリーンサーフェース
+        sizex: ウィンドウの幅
+        sizey: ウィンドウの高さ
+        """
         self.screen = screen # スクリーンサーフェースを設定
         self.sizex = sizex # ウィンドウの幅を設定
         self.sizey = sizey # ウィンドウの高さを設定
@@ -17,6 +26,11 @@ class Speedometer:
         self.meter_radius = 80 # メーターの半径を設定
 
     def draw(self, sokudo:float):
+        """
+        スピードメーターを描画する関数
+        sokudo: 車の速度
+        meter_huti変数: メーターの大きさを決める
+        """
         meter_huti = self.meter_radius//10 # メーターの縁の太さ
         meter_angle = -45 + (sokudo / 150) * 180  # 速度に応じた角度（0-150km/hを180-45度の位置に変換）
         # メーターの縁を描画
