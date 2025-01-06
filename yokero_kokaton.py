@@ -25,14 +25,16 @@ class Speedometer:
         self.meter_x = sizex - sizex / 7 # メーターのx座標を設定
         self.meter_y = sizey - sizey / 11 # メーターのy座標を設定
         self.meter_radius = 80 # メーターの半径を設定
-
+        self.meter_strt_kakudo = 45 # メーターの始点の角度
+        self.meter_end_kakudo = 225 # メーターの終点の角度
+        
     def draw(self, sokudo:float):
         """
         スピードメーターを描画する関数
         sokudo: 車の速度
         """
         meter_huti = self.meter_radius//10 # メーターの縁の太さ
-        meter_angle = -45 + (sokudo / 150) * 180  # 速度に応じた角度（0-150km/hを180-45度の位置に変換）
+        meter_angle = -self.meter_strt_kakudo + (sokudo / 150) * 180  # 速度に応じた角度（0-150km/hを180-45度の位置に変換）
         # メーターの縁を描画
         pg.draw.circle(self.screen, (50, 50, 50), (self.meter_x, self.meter_y), self.meter_radius, meter_huti) # メーターの背景円を描画
         # メーターの内側を透明にする
@@ -42,7 +44,7 @@ class Speedometer:
         # メーターの内側円を描画(デザイン用)
         pg.draw.circle(self.screen, (100, 100, 255), (self.meter_x, self.meter_y), self.meter_radius - meter_huti + 1, self.meter_radius//30) # メーターの内側円を描画
         # メーターのメモリを描画
-        for i in range(-44, 226, 24):  # 0度から180度まで24度刻みでメモリを描画
+        for i in range(-self.meter_strt_kakudo+1, self.meter_end_kakudo+1, 24):  # 0度から180度まで24度刻みでメモリを描画
             angle = 180 - i # 角度を計算
             start_x = self.meter_x + (self.meter_radius - meter_huti - self.meter_radius//20) * math.cos(math.radians(angle)) # メモリの始点のx座標
             start_y = self.meter_y - (self.meter_radius - meter_huti - self.meter_radius//20) * math.sin(math.radians(angle)) # メモリの始点のy座標
@@ -50,7 +52,7 @@ class Speedometer:
             end_y = self.meter_y - (self.meter_radius - meter_huti - self.meter_radius//6) * math.sin(math.radians(angle)) # メモリの終点のy座標
             pg.draw.line(self.screen, (255, 255, 255), (start_x, start_y), (end_x, end_y), 2) # メモリを描画
         # メーターの細かなメモリを描画
-        for i in range(-44, 225, 6):  # 0度から180度まで6度刻みで細かなメモリを描画
+        for i in range(-self.meter_strt_kakudo+1, self.meter_end_kakudo, 6):  # 0度から180度まで6度刻みで細かなメモリを描画
             angle = 180 - i # 角度を計算
             start_x = self.meter_x + (self.meter_radius - meter_huti - self.meter_radius//20) * math.cos(math.radians(angle)) # メモリの始点のx座標
             start_y = self.meter_y - (self.meter_radius - meter_huti - self.meter_radius//20) * math.sin(math.radians(angle)) # メモリの始点のy座標
