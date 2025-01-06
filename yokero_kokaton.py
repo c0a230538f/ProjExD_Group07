@@ -369,7 +369,7 @@ def main():
         if a == "end":
             GameOver = GameOverScreen(screen, sizex, sizey)
             GameOver.display(int(maxspeed), tmr// framerate, ("%.3f"%(distance)))
-            time.sleep(3)
+            time.sleep(5)
             return
 
 
