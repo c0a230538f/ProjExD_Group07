@@ -27,7 +27,7 @@ class Speedometer:
         self.meter_radius = 80 # メーターの半径を設定
         self.meter_strt_kakudo = 45 # メーターの始点の角度
         self.meter_end_kakudo = 225 # メーターの終点の角度
-        
+
     def draw(self, sokudo:float):
         """
         スピードメーターを描画する関数
@@ -275,21 +275,22 @@ def main():
     メイン関数
     
     Returns: なし
+    power変数: 車のパワーを設定できます。
     """
     sizex = 600  # ウィンドウの幅を設定
     sizey = 800  # ウィンドウの高さを設定
     framerate = 200  # フレームレートを設定
+    power = 300 # 車のパワー
     idoukyori = 0
     energy = 0 # 車のエネルギー(速度の算出に使用)
     sokudo = 0 # 速度の初期値
-    power = 300 # 車のパワー
-    clp = False # クリープ現象の有無
     idoukyori = 0
     explosion_migi = False  # 右の爆発の状態を初期化
     explosion_hidari = False  # 左の爆発の状態を初期化
     kx = 0
     maxspeed = 0
     distance = 0
+    clp = False # クリープ現象の状態を初期化
 
     pg.display.set_caption("こうかとんをよけろ！")  # ウィンドウのキャプションを設定
     screen = pg.display.set_mode((sizex, sizey))  # ウィンドウのサイズを設定し、スクリーンサーフェースを作成
